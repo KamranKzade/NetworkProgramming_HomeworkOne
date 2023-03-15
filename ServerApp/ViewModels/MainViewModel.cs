@@ -94,30 +94,11 @@ namespace ServerApp.ViewModels
                             break;
                         }
                     } while (true);
+                    
                     //});
                     //task.Start();
                 }
             }
-
-
-            //   //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //
-            //   foreach (var image in GalaryImages)
-            //   {
-            //       BitmapImage picture = new BitmapImage(new Uri(image.ImageUrl, UriKind.Relative));
-            //       CurrentPicture = picture;
-            //
-            //       var vm = new UC_ViewModel();
-            //       vm.CurrentImageSource = picture;
-            //       vm.Photo = image;
-            //
-            //       var uc = new Picture_UserControl();
-            //       uc.DataContext = vm;
-            //
-            //       uniform.Children.Add(uc);
-            //   }
-            //
-
         }
     }
 }
