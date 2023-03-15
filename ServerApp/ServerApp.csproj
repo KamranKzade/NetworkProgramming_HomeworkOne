@@ -55,6 +55,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\GalaryImage.cs" />
+    <Compile Include="Repositories\FakeRepo.cs" />
+    <Compile Include="ViewModels\UC_ViewModel.cs" />
     <Compile Include="Views\UserControls\Picture_UserControl.xaml.cs">
       <DependentUpon>Picture_UserControl.xaml</DependentUpon>
     </Compile>

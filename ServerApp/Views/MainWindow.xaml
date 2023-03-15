@@ -30,7 +30,7 @@
                  Text="ServerApp"
                  HorizontalContentAlignment="Center"
                  VerticalContentAlignment="Center"
-                 Style="{StaticResource txbox_style}"
+                 Style="{StaticResource  txbox_style}"
                  Foreground="Red"
                  FontSize="40"
                  />
