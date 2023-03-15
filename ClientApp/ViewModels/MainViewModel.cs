@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Windows;
 using Microsoft.Win32;
 using ClientApp.Models;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Shapes;
 using System.Windows.Media.Imaging;
 using System.Runtime.Serialization.Formatters.Binary;
+
 
 
 namespace ClientApp.ViewModels
@@ -128,7 +130,24 @@ namespace ClientApp.ViewModels
                                 socket.Send(bytes);
                             }
                         });
-                        Task.WaitAll(sender);
+
+                        var receiver = Task.Run(() =>
+                        {
+                            var length = 0;
+                            var bytes = new byte[1024];
+                            do
+                            {
+                                length = socket.Receive(bytes);
+                                if (length > 0)
+                                {
+                                    var msg = Encoding.UTF8.GetString(bytes, 0, length);
+                                    Console.WriteLine(msg);
+                                }
+                            }
+                            while (true);
+                        });
+
+                        Task.WaitAll(receiver, sender);
                     }
 
                 }
