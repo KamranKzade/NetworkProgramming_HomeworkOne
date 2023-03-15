@@ -66,6 +66,8 @@ namespace ServerApp.ViewModels
                             length = client.Receive(bytes);
                             var msj = FromByteArray<GalaryImage>(bytes);
 
+                            //  string s = JsonConvert.DeserializeObject<GalaryImage>(str);
+                            
                             GalaryImages.Add(msj);
                            
                             foreach (var image in GalaryImages)

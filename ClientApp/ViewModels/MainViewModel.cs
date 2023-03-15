@@ -12,8 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Shapes;
 using System.Windows.Media.Imaging;
 using System.Runtime.Serialization.Formatters.Binary;
-
-
+using Newtonsoft.Json;
 
 namespace ClientApp.ViewModels
 {
@@ -125,8 +124,10 @@ namespace ClientApp.ViewModels
                         {
                             while (true)
                             {
-                                var bytes = ToByteArray(Image);
-                                //var bytes = Encoding.UTF8.GetBytes(Image);
+                                //var bytes =  ToByteArray(Image);
+
+                                string s = JsonConvert.SerializeObject(Image);
+                                var bytes = Encoding.UTF8.GetBytes(s);
                                 socket.Send(bytes);
                             }
                         });
@@ -185,15 +186,18 @@ namespace ClientApp.ViewModels
         }
 
 
-        private byte[] ToByteArray(object source)
-        {
-            var formatter = new BinaryFormatter();
-            using (var stream = new MemoryStream())
-            {
-                formatter.Serialize(stream, source);
-                return stream.ToArray();
-            }
-        }
+       // private byte[] ToByteArray(object obj)
+       // {
+       //     if (obj == null)
+       //         return null;
+       //     BinaryFormatter bf = new BinaryFormatter();
+       //     using (MemoryStream ms = new MemoryStream())
+       //     {
+       //         ms.Capacity = 10240;
+       //         bf.Serialize(ms, obj);
+       //         return ms.ToArray();
+       //     }
+       // }
     }
 
 }
