@@ -12,14 +12,14 @@ namespace ServerApp.Repositories
         {
             return new ObservableCollection<GalaryImage>()
             {
-            new GalaryImage()
-            {
-                 Author ="Kamran",
-                 Name = "Server",
-                 Time = new DateTime(1503,1, 1),
-                 ImageUrl = "C:\\Users\\Kamran\\source\\repos\\NetworkProgramming_HomeworkOne\\ServerApp\\Images\\server.png"
-            }
-        };
+                 new GalaryImage()
+                 {
+                      Author ="Server",
+                      Name = "Kamran",
+                      Time = new DateTime(2019,1, 1),
+                      ImageUrl = "C:\\Users\\Kamran\\source\\repos\\NetworkProgramming_HomeworkOne\\ServerApp\\Images\\server.png"
+                 }
+            };
 
         }
     }
