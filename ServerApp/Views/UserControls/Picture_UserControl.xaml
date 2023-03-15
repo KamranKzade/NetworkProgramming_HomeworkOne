@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="ServerApp.Views.UserControls.Picture_UserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ServerApp.Views.UserControls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel Background="{StaticResource userControl_background}" Margin="5" >
+
+        <TextBox Text="{Binding Photo.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 Margin="5"
+                 Style="{StaticResource txbox_style}"/>
+
+
+        <Ellipse Margin="2"
+                 Height="200"
+                 Width="350">
+            <Ellipse.Fill>
+                <ImageBrush x:Name="Picture" 
+                            ImageSource="{Binding CurrentImageSource, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Stretch="Fill" 
+                           />
+            </Ellipse.Fill>
+        </Ellipse>
+
+
+        <TextBox Text="{Binding Photo.Author, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                 Margin="2"
+                 Style="{StaticResource txbox_style}"/>
+
+        <TextBox Text="{Binding Photo.Time, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 Style="{StaticResource txbox_style}"/>
+    </StackPanel>
+</UserControl>

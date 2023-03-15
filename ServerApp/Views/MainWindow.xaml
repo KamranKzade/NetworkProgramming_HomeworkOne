@@ -1,0 +1,51 @@
+﻿<Window x:Class="ServerApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ServerApp"
+        mc:Ignorable="d"
+        Title="ServerApp"
+        Height="600"
+        WindowStartupLocation="CenterScreen"
+        Width="800"
+        ResizeMode="NoResize" 
+        Icon="/Images/server.png"
+        >
+    <Window.Background>
+        <LinearGradientBrush>
+            <GradientStop Color="Yellow" Offset="0"/>
+            <GradientStop Color="Green" Offset="0.5"/>
+            <GradientStop Color="Blue" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBox Grid.Row="0"
+                 Text="ServerApp"
+                 HorizontalContentAlignment="Center"
+                 VerticalContentAlignment="Center"
+                 Style="{StaticResource txbox_style}"
+                 Foreground="Red"
+                 FontSize="40"
+                 />
+
+        <ScrollViewer Grid.Row="1"
+                      HorizontalScrollBarVisibility="Auto"
+                      Margin="10"
+                      >
+            <UniformGrid Name="wrapPanel"
+                         Columns="3"
+                         Background="{StaticResource wrapPanelColor}">
+
+
+            </UniformGrid>
+        </ScrollViewer>
+
+    </Grid>
+</Window>
