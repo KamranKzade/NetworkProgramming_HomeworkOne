@@ -1,31 +1,29 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Text;
 using System.Windows;
 using Microsoft.Win32;
-using ClientApp.Models;
-using System.Net.Sockets;
-using ClientApp.Commands;
-using System.Windows.Media;
-using System.Threading.Tasks;
-using System.Windows.Shapes;
-using System.Windows.Media.Imaging;
-using System.Runtime.Serialization.Formatters.Binary;
 using Newtonsoft.Json;
+using ClientApp.Models;
+using ClientApp.Commands;
+using System.Net.Sockets;
+using System.Windows.Media;
+using System.Windows.Shapes;
+using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 
 namespace ClientApp.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
-        public GalaryImage Image { get; set; }
         public string FilePath { get; set; }
+        public GalaryImage Image { get; set; }
         public ImageBrush Picture { get; set; }
 
 
         public RelayCommand AddImageCommand { get; set; }
-        public RelayCommand AddImageButtonWithCommand { get; set; }
         public RelayCommand CLoadModelFromDisk { get; set; }
+        public RelayCommand AddImageButtonWithCommand { get; set; }
 
 
 
@@ -53,8 +51,6 @@ namespace ClientApp.ViewModels
 
 
 
-
-
         public MainViewModel()
         {
             Image = new GalaryImage();
@@ -63,7 +59,6 @@ namespace ClientApp.ViewModels
             AddImageCommand = new RelayCommand((o) =>
             {
                 var Picture = o as ImageBrush;
-
                 OpenFileDialog Op = new OpenFileDialog();
 
                 Op.Title = "Select a picture";
@@ -86,15 +81,11 @@ namespace ClientApp.ViewModels
                 var author_name = AuthorNameTxt;
                 var creation_time = CreationDateTxt;
 
-                Image.Name = imageName_name;
-                Image.Author = author_name;
-                Image.ImageUrl = FilePath;
-
-
-
-
                 try
                 {
+                    Image.Name = imageName_name;
+                    Image.Author = author_name;
+                    Image.ImageUrl = FilePath;
                     Image.Time = DateTime.Parse(creation_time);
                 }
                 catch (Exception ex)
@@ -102,15 +93,10 @@ namespace ClientApp.ViewModels
                     MessageBox.Show(ex.Message, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
-                // MessageBox.Show("Successfully");
-
                 var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-                var ipAddress = IPAddress.Parse("192.168.1.16");
                 var port = 27001;
-
+                var ipAddress = IPAddress.Parse("192.168.1.16");
                 var endPoint = new IPEndPoint(ipAddress, port);
-
 
 
                 try
@@ -124,8 +110,6 @@ namespace ClientApp.ViewModels
                         {
                             while (true)
                             {
-                                //var bytes =  ToByteArray(Image);
-
                                 string s = JsonConvert.SerializeObject(Image);
                                 var bytes = Encoding.UTF8.GetBytes(s);
                                 socket.Send(bytes);
@@ -150,7 +134,6 @@ namespace ClientApp.ViewModels
 
                         Task.WaitAll(receiver, sender);
                     }
-
                 }
                 catch (Exception)
                 {
@@ -184,20 +167,5 @@ namespace ClientApp.ViewModels
                 }
             }
         }
-
-
-       // private byte[] ToByteArray(object obj)
-       // {
-       //     if (obj == null)
-       //         return null;
-       //     BinaryFormatter bf = new BinaryFormatter();
-       //     using (MemoryStream ms = new MemoryStream())
-       //     {
-       //         ms.Capacity = 10240;
-       //         bf.Serialize(ms, obj);
-       //         return ms.ToArray();
-       //     }
-       // }
     }
-
 }

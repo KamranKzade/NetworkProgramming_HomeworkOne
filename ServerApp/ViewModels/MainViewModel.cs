@@ -1,16 +1,16 @@
 ﻿using System;
+using System.Net;
+using System.Text;
+using System.Windows;
+using Newtonsoft.Json;
 using ServerApp.Models;
+using System.Net.Sockets;
+using System.Threading.Tasks;
 using ServerApp.Views.UserControls;
 using System.Windows.Media.Imaging;
 using System.Collections.ObjectModel;
 using System.Windows.Controls.Primitives;
-using System.Net;
-using System.Net.Sockets;
-using System.Windows;
-using System.Threading.Tasks;
-using System.Text;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+
 
 namespace ServerApp.ViewModels
 {
@@ -34,107 +34,90 @@ namespace ServerApp.ViewModels
         public MainViewModel(UniformGrid uniform)
         {
             GalaryImages = new ObservableCollection<GalaryImage>();
+            GalaryImages = new ObservableCollection<GalaryImage>(Repositories.FakeRepo.GetGalaryImages());
 
-
-            // Bu hissede olaraq 34 un yerine 
-
-            var ipAddress = IPAddress.Parse("192.168.1.16");
             var port = 27001;
+            var ipAddress = IPAddress.Parse("192.168.1.16");
 
             using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
             {
                 var endPoint = new IPEndPoint(ipAddress, port);
                 socket.Bind(endPoint);
-
                 socket.Listen(5);
 
-                MessageBox.Show($"Listen over {socket.LocalEndPoint}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                while (true)
+                int count = 0;
+                while (count == 0)
                 {
                     var client = socket.Accept();
-                    Task.Run(() =>
+
+                    //var task = new Task(() =>
+                    //{
+
+                    MessageBox.Show(($"{client.RemoteEndPoint} connected successfully"), "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var length = 0;
+                    var bytes = new byte[10000];
+
+                    do
                     {
-                        MessageBox.Show(($"{client.RemoteEndPoint} connected successfully"), "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                        var length = 0;
-                        var bytes = new byte[10000];
-
-
-                        do
+                        length = client.Receive(bytes);
+                        var msj = Encoding.UTF8.GetString(bytes);
+                        if (count > 0)
                         {
-                            length = client.Receive(bytes);
-                            var msj = FromByteArray<GalaryImage>(bytes);
+                            break;
+                        }
+                        var ClientGalaryImage = JsonConvert.DeserializeObject<GalaryImage>(msj);
 
-                            //  string s = JsonConvert.DeserializeObject<GalaryImage>(str);
-                            
-                            GalaryImages.Add(msj);
-                           
-                            foreach (var image in GalaryImages)
-                            {
-                                BitmapImage picture = new BitmapImage(new Uri(image.ImageUrl, UriKind.Relative));
-                                CurrentPicture = picture;
 
-                                var vm = new UC_ViewModel();
-                                vm.CurrentImageSource = picture;
-                                vm.Photo = image;
+                        GalaryImages.Add(ClientGalaryImage);
 
-                                var uc = new Picture_UserControl();
-                                uc.DataContext = vm;
+                        foreach (var image in GalaryImages)
+                        {
+                            BitmapImage picture = new BitmapImage(new Uri(image.ImageUrl, UriKind.Relative));
+                            CurrentPicture = picture;
 
-                                uniform.Children.Add(uc);
-                            }
+                            var vm = new UC_ViewModel();
+                            vm.CurrentImageSource = picture;
+                            vm.Photo = image;
 
-                            if (msj.Name == "Exit")
-                            {
-                                client.Shutdown(SocketShutdown.Both);
-                                client.Dispose();
-                                break;
-                            }
-                        } while (true);
-                    });
+                            var uc = new Picture_UserControl();
+                            uc.DataContext = vm;
 
+                            uniform.Children.Add(uc);
+                            count++;
+                        }
+
+                        if (ClientGalaryImage.Name == "Exit")
+                        {
+                            client.Shutdown(SocketShutdown.Both);
+                            client.Dispose();
+                            break;
+                        }
+                    } while (true);
+                    //});
+                    //task.Start();
                 }
-
-
             }
 
-            GalaryImages = new ObservableCollection<GalaryImage>(Repositories.FakeRepo.GetGalaryImages());
 
+            //   //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //
+            //   foreach (var image in GalaryImages)
+            //   {
+            //       BitmapImage picture = new BitmapImage(new Uri(image.ImageUrl, UriKind.Relative));
+            //       CurrentPicture = picture;
+            //
+            //       var vm = new UC_ViewModel();
+            //       vm.CurrentImageSource = picture;
+            //       vm.Photo = image;
+            //
+            //       var uc = new Picture_UserControl();
+            //       uc.DataContext = vm;
+            //
+            //       uniform.Children.Add(uc);
+            //   }
+            //
 
-
-
-
-
-         //   //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-         //
-         //   foreach (var image in GalaryImages)
-         //   {
-         //       BitmapImage picture = new BitmapImage(new Uri(image.ImageUrl, UriKind.Relative));
-         //       CurrentPicture = picture;
-         //
-         //       var vm = new UC_ViewModel();
-         //       vm.CurrentImageSource = picture;
-         //       vm.Photo = image;
-         //
-         //       var uc = new Picture_UserControl();
-         //       uc.DataContext = vm;
-         //
-         //       uniform.Children.Add(uc);
-         //   }
-         //
-
-        }
-        public T FromByteArray<T>(byte[] data)
-        {
-            if (data == null)
-                return default(T);
-            BinaryFormatter bf = new BinaryFormatter();
-            using (MemoryStream ms = new MemoryStream(data))
-            {
-                object obj = bf.Deserialize(ms);
-                return (T)obj;
-            }
         }
     }
 }
