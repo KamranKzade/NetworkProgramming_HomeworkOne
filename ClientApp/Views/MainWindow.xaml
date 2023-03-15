@@ -10,8 +10,117 @@
         Width="800"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize" 
+        Background="{StaticResource mainColor}"
         Icon="/Images/client.png">
-    <Grid>
-        
-    </Grid>
+    <StackPanel Background="{StaticResource userControl_background}" 
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Margin="10"
+                Name="myStackPanel">
+        <Grid Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.85*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Image Name"
+                   Style="{StaticResource simpleLabelStyle}"
+                   HorizontalContentAlignment="Left"/>
+
+            <TextBox Grid.Column="1"
+                     Text="{Binding ImageNameTxt,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource textBStyle}"/>
+
+        </Grid>
+
+        <!-- Image -->
+        <StackPanel>
+            <Ellipse Margin="2"
+                     Height="200"
+                     AllowDrop="True"
+                     Name="Ellipse"
+                     Width="350">
+                <Ellipse.Fill>
+                    <ImageBrush x:Name="Picture"
+                                Stretch="Fill" 
+                           />
+                </Ellipse.Fill>
+                <Ellipse.InputBindings>
+                    <MouseBinding 
+                           Command="{Binding CLoadModelFromDisk}"
+                           CommandParameter="{Binding ElementName=Ellipse}"
+                           Gesture="LeftClick"  
+                    />
+                </Ellipse.InputBindings>
+            </Ellipse>
+
+            <Button HorizontalAlignment="Center"
+                    Margin="10"
+                    Padding="10"
+                    Command="{Binding AddImageCommand}"
+                    CommandParameter="{Binding ElementName=Picture}"
+                    Content="Add Image"
+                    FontFamily="Comic Sans Ms"
+                    FontWeight="Medium"
+                    FontSize="{StaticResource MenuSize}"
+                    Foreground="{StaticResource wrapPanelColor}"
+                    BorderThickness="0"
+                    Background="Chocolate">
+
+            </Button>
+        </StackPanel>
+
+        <!-- Author -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.85*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Author Name"
+                   Style="{StaticResource simpleLabelStyle}"/>
+
+            <TextBox Grid.Column="1"
+                     Text="{Binding AuthorNameTxt,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource textBStyle}"/>
+
+        </Grid>
+
+        <!-- Creation Date -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.85*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Creation Date"
+                   Style="{StaticResource simpleLabelStyle}"
+                   HorizontalContentAlignment="Left"/>
+
+            <TextBox Grid.Column="1"
+                     Text="{Binding CreationDateTxt,Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{StaticResource textBStyle}"/>
+
+        </Grid>
+
+
+        <Button HorizontalAlignment="Center"
+                Width="150"
+                Command="{Binding AddImageButtonWithCommand}"
+                CommandParameter="{Binding ElementName=window}"
+                BorderThickness="0"
+                Background="Transparent"
+                Height="70">
+            <Ellipse Width="140"
+                     Height="60">
+                <Ellipse.Fill>
+                    <ImageBrush ImageSource="/Images/data-in-both-directions.png"
+                                Stretch="Uniform"/>
+                </Ellipse.Fill>
+            </Ellipse>
+
+        </Button>
+
+
+    </StackPanel>
 </Window>
