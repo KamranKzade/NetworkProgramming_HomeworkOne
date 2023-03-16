@@ -34,7 +34,6 @@ namespace ServerApp.ViewModels
         public MainViewModel(UniformGrid uniform)
         {
             GalaryImages = new ObservableCollection<MyImage>();
-            GalaryImages = new ObservableCollection<MyImage>(Repositories.FakeRepo.GetGalaryImages());
 
 
             var port = 27001;
@@ -53,16 +52,12 @@ namespace ServerApp.ViewModels
                     {
                         var client = socket.Accept();
 
-                        if (client.Connected)
-                            MessageBox.Show("Okey");
-
-
                         var task = new Task(() =>
                         {
 
                             MessageBox.Show(($"{client.RemoteEndPoint} connected successfully"), "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                             var length = 0;
-                            var bytes = new byte[10000];
+                            var bytes = new byte[short.MaxValue];
 
                             do
                             {
@@ -77,23 +72,23 @@ namespace ServerApp.ViewModels
                                 });
 
 
-                                foreach (var image in GalaryImages)
-                                {
-                                    BitmapImage picture = new BitmapImage(new Uri(image.ImageUrl, UriKind.Relative));
-                                    CurrentPicture = picture;
+                                //foreach (var image in GalaryImages)
+                                //{
+                                //    BitmapImage picture = new BitmapImage(new Uri(ClientGalaryImage.ImageUrl, UriKind.Relative));
+                                //    CurrentPicture = picture;
 
-                                    var vm = new UC_ViewModel();
-                                    vm.CurrentImageSource = picture;
-                                    vm.Photo = image;
+                                //    var vm = new UC_ViewModel();
+                                //    vm.CurrentImageSource = picture;
+                                //    vm.Photo = ClientGalaryImage;
+                                    
+                                //    App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                                //    {
+                                //        var uc = new Picture_UserControl();
+                                //        uc.DataContext = vm;
+                                //        uniform.Children.Add(uc);
+                                //    });
 
-                                    App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
-                                    {
-                                        var uc = new Picture_UserControl();
-                                        uc.DataContext = vm;
-                                        uniform.Children.Add(uc);
-                                    });
-
-                                }
+                                //}
 
                                 if (ClientGalaryImage.Name == "Exit")
                                 {
