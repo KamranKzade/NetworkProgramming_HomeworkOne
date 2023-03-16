@@ -10,7 +10,7 @@ using ServerApp.Views.UserControls;
 using System.Windows.Media.Imaging;
 using System.Collections.ObjectModel;
 using System.Windows.Controls.Primitives;
-
+using System.Threading;
 
 namespace ServerApp.ViewModels
 {
@@ -36,14 +36,14 @@ namespace ServerApp.ViewModels
             GalaryImages = new ObservableCollection<MyImage>();
             GalaryImages = new ObservableCollection<MyImage>(Repositories.FakeRepo.GetGalaryImages());
 
+
             var port = 27001;
             var ipAddress = IPAddress.Parse("192.168.1.16");
             var endPoint = new IPEndPoint(ipAddress, port);
 
 
-            var task = new Task(() =>
+            Thread thread = new Thread(() =>
             {
-
                 using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
                 {
                     socket.Bind(endPoint);
@@ -51,62 +51,69 @@ namespace ServerApp.ViewModels
 
                     while (true)
                     {
-
                         var client = socket.Accept();
 
+                        if (client.Connected)
+                            MessageBox.Show("Okey");
 
-                        MessageBox.Show(($"{client.RemoteEndPoint} connected successfully"), "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-                        var length = 0;
-                        var bytes = new byte[10000];
 
-                        do
+                        var task = new Task(() =>
                         {
-                            length = client.Receive(bytes);
-                            var msj = Encoding.UTF8.GetString(bytes);
-                            var ClientGalaryImage = JsonConvert.DeserializeObject<MyImage>(msj);
 
+                            MessageBox.Show(($"{client.RemoteEndPoint} connected successfully"), "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                            var length = 0;
+                            var bytes = new byte[10000];
 
-                            // GalaryImages.Add(ClientGalaryImage);
-
-                            App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
-                                {
-                                    GalaryImages.Add(ClientGalaryImage);
-                                }
-
-                        );
-
-                            foreach (var image in GalaryImages)
+                            do
                             {
-                                BitmapImage picture = new BitmapImage(new Uri(image.ImageUrl, UriKind.Relative));
-                                CurrentPicture = picture;
+                                length = client.Receive(bytes);
+                                var msj = Encoding.UTF8.GetString(bytes);
+                                var ClientGalaryImage = JsonConvert.DeserializeObject<MyImage>(msj);
 
-                                var vm = new UC_ViewModel();
-                                vm.CurrentImageSource = picture;
-                                vm.Photo = image;
 
-                                var uc = new Picture_UserControl();
-                                uc.DataContext = vm;
-
-                                // uniform.Children.Add(uc);
+                                // GalaryImages.Add(ClientGalaryImage);
 
                                 App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                                {
+                                    GalaryImages.Add(ClientGalaryImage);
+                                });
+
+                                foreach (var image in GalaryImages)
+                                {
+                                    BitmapImage picture = new BitmapImage(new Uri(image.ImageUrl, UriKind.Relative));
+                                    CurrentPicture = picture;
+
+                                    var vm = new UC_ViewModel();
+                                    vm.CurrentImageSource = picture;
+                                    vm.Photo = image;
+
+                                    var uc = new Picture_UserControl();
+                                    uc.DataContext = vm;
+
+                                    // uniform.Children.Add(uc);
+
+                                    App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
                                     {
                                         uniform.Children.Add(uc);
                                     });
-                            }
 
-                            if (ClientGalaryImage.Name == "Exit")
-                            {
-                                client.Shutdown(SocketShutdown.Both);
-                                client.Dispose();
-                                break;
-                            }
-                        } while (true);
+                                }
+
+                                if (ClientGalaryImage.Name == "Exit")
+                                {
+                                    client.Shutdown(SocketShutdown.Both);
+                                    client.Dispose();
+                                    break;
+                                }
+                            } while (true);
+
+                        });
+                        task.Start();
+
 
                     }
                 }
             });
-            task.Start();
 
         }
     }
