@@ -103,6 +103,7 @@ namespace ServerApp.ViewModels
 
                     });
                     task.Start();
+
                 }
             }
         }
