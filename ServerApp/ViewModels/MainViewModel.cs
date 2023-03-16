@@ -10,7 +10,6 @@ using ServerApp.Views.UserControls;
 using System.Windows.Media.Imaging;
 using System.Collections.ObjectModel;
 using System.Windows.Controls.Primitives;
-using System.Windows.Controls;
 
 
 namespace ServerApp.ViewModels
@@ -42,18 +41,19 @@ namespace ServerApp.ViewModels
             var endPoint = new IPEndPoint(ipAddress, port);
 
 
-            using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            var task = new Task(() =>
             {
-                socket.Bind(endPoint);
-                socket.Listen(5);
 
-
-                while (true)
+                using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
                 {
-                    var client = socket.Accept();
+                    socket.Bind(endPoint);
+                    socket.Listen(5);
 
-                    var task = new Task(() =>
+                    while (true)
                     {
+
+                        var client = socket.Accept();
+
 
                         MessageBox.Show(($"{client.RemoteEndPoint} connected successfully"), "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                         var length = 0;
@@ -69,9 +69,11 @@ namespace ServerApp.ViewModels
                             // GalaryImages.Add(ClientGalaryImage);
 
                             App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
-                            {
-                                GalaryImages.Add(ClientGalaryImage);
-                            });
+                                {
+                                    GalaryImages.Add(ClientGalaryImage);
+                                }
+
+                        );
 
                             foreach (var image in GalaryImages)
                             {
@@ -88,9 +90,9 @@ namespace ServerApp.ViewModels
                                 // uniform.Children.Add(uc);
 
                                 App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
-                                {
-                                    uniform.Children.Add(uc);
-                                });
+                                    {
+                                        uniform.Children.Add(uc);
+                                    });
                             }
 
                             if (ClientGalaryImage.Name == "Exit")
@@ -101,11 +103,11 @@ namespace ServerApp.ViewModels
                             }
                         } while (true);
 
-                    });
-                    task.Start();
-
+                    }
                 }
-            }
+            });
+            task.Start();
+
         }
     }
 }
