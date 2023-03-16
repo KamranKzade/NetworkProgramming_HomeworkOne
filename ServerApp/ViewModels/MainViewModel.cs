@@ -16,8 +16,8 @@ namespace ServerApp.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
-        private ObservableCollection<GalaryImage> galaryImages;
-        public ObservableCollection<GalaryImage> GalaryImages
+        private ObservableCollection<MyImage> galaryImages;
+        public ObservableCollection<MyImage> GalaryImages
         {
             get { return galaryImages; }
             set
@@ -33,8 +33,8 @@ namespace ServerApp.ViewModels
 
         public MainViewModel(UniformGrid uniform)
         {
-            GalaryImages = new ObservableCollection<GalaryImage>();
-            GalaryImages = new ObservableCollection<GalaryImage>(Repositories.FakeRepo.GetGalaryImages());
+            GalaryImages = new ObservableCollection<MyImage>();
+            GalaryImages = new ObservableCollection<MyImage>(Repositories.FakeRepo.GetGalaryImages());
 
             var port = 27001;
             var ipAddress = IPAddress.Parse("192.168.1.16");
@@ -46,57 +46,51 @@ namespace ServerApp.ViewModels
                 socket.Listen(5);
 
 
-                int count = 0;
-                while (count == 0)
+                while (true)
                 {
                     var client = socket.Accept();
 
-                    //var task = new Task(() =>
-                    //{
-
-                    MessageBox.Show(($"{client.RemoteEndPoint} connected successfully"), "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-                    var length = 0;
-                    var bytes = new byte[10000];
-
-                    do
+                    var task = new Task(() =>
                     {
-                        length = client.Receive(bytes);
-                        var msj = Encoding.UTF8.GetString(bytes);
-                        if (count > 0)
+
+                        MessageBox.Show(($"{client.RemoteEndPoint} connected successfully"), "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                        var length = 0;
+                        var bytes = new byte[10000];
+
+                        do
                         {
-                            break;
-                        }
-                        var ClientGalaryImage = JsonConvert.DeserializeObject<GalaryImage>(msj);
+                            length = client.Receive(bytes);
+                            var msj = Encoding.UTF8.GetString(bytes);
+                            var ClientGalaryImage = JsonConvert.DeserializeObject<MyImage>(msj);
 
 
-                        GalaryImages.Add(ClientGalaryImage);
+                            GalaryImages.Add(ClientGalaryImage);
 
-                        foreach (var image in GalaryImages)
-                        {
-                            BitmapImage picture = new BitmapImage(new Uri(image.ImageUrl, UriKind.Relative));
-                            CurrentPicture = picture;
+                            foreach (var image in GalaryImages)
+                            {
+                                BitmapImage picture = new BitmapImage(new Uri(image.ImageUrl, UriKind.Relative));
+                                CurrentPicture = picture;
 
-                            var vm = new UC_ViewModel();
-                            vm.CurrentImageSource = picture;
-                            vm.Photo = image;
+                                var vm = new UC_ViewModel();
+                                vm.CurrentImageSource = picture;
+                                vm.Photo = image;
 
-                            var uc = new Picture_UserControl();
-                            uc.DataContext = vm;
+                                var uc = new Picture_UserControl();
+                                uc.DataContext = vm;
 
-                            uniform.Children.Add(uc);
-                            count++;
-                        }
+                                uniform.Children.Add(uc);
+                            }
 
-                        if (ClientGalaryImage.Name == "Exit")
-                        {
-                            client.Shutdown(SocketShutdown.Both);
-                            client.Dispose();
-                            break;
-                        }
-                    } while (true);
-                    
-                    //});
-                    //task.Start();
+                            if (ClientGalaryImage.Name == "Exit")
+                            {
+                                client.Shutdown(SocketShutdown.Both);
+                                client.Dispose();
+                                break;
+                            }
+                        } while (true);
+
+                    });
+                    task.Start();
                 }
             }
         }

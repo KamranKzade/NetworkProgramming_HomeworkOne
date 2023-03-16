@@ -8,11 +8,11 @@ namespace ServerApp.Repositories
 {
     public class FakeRepo
     {
-        public static ObservableCollection<GalaryImage> GetGalaryImages()
+        public static ObservableCollection<MyImage> GetGalaryImages()
         {
-            return new ObservableCollection<GalaryImage>()
+            return new ObservableCollection<MyImage>()
             {
-                 new GalaryImage()
+                 new MyImage()
                  {
                       Author ="Server",
                       Name = "Kamran",

@@ -6,8 +6,8 @@ namespace ServerApp.ViewModels
 {
     public class UC_ViewModel : BaseViewModel
     {
-        private GalaryImage photo;
-        public GalaryImage Photo
+        private MyImage photo;
+        public MyImage Photo
         {
             get { return photo; }
             set

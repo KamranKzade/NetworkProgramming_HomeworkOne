@@ -1,11 +1,10 @@
 ﻿using System;
-using ServerApp.ViewModels;
+using ClientApp.ViewModels;
 
 
-
-namespace ServerApp.Models
+namespace ClientApp.Models
 {
-    public class GalaryImage:BaseViewModel
+    public class MyImage : BaseViewModel
     {
         private string name;
         public string Name
@@ -55,10 +54,5 @@ namespace ServerApp.Models
             }
         }
 
-
-        public override string ToString()
-        {
-            return base.ToString();
-        }
     }
 }

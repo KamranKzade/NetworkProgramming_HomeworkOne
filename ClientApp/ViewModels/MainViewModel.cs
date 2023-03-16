@@ -12,12 +12,13 @@ using System.Windows.Shapes;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
+
 namespace ClientApp.ViewModels
 {
     public class MainViewModel : BaseViewModel
     {
+        public MyImage Image { get; set; }
         public string FilePath { get; set; }
-        public GalaryImage Image { get; set; }
         public ImageBrush Picture { get; set; }
 
 
@@ -53,7 +54,7 @@ namespace ClientApp.ViewModels
 
         public MainViewModel()
         {
-            Image = new GalaryImage();
+            Image = new MyImage();
 
 
             AddImageCommand = new RelayCommand((o) =>
@@ -74,29 +75,26 @@ namespace ClientApp.ViewModels
             });
 
 
+            var port = 27001;
+            var ipAddress = IPAddress.Parse("192.168.1.16");
+
 
             AddImageButtonWithCommand = new RelayCommand((o) =>
             {
-                var imageName_name = ImageNameTxt;
-                var author_name = AuthorNameTxt;
-                var creation_time = CreationDateTxt;
-
                 try
                 {
-                    Image.Name = imageName_name;
-                    Image.Author = author_name;
+                    Image.Name = ImageNameTxt;
+                    Image.Author = AuthorNameTxt;
                     Image.ImageUrl = FilePath;
-                    Image.Time = DateTime.Parse(creation_time);
+                    Image.Time = DateTime.Parse(CreationDateTxt);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
-                var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                var port = 27001;
-                var ipAddress = IPAddress.Parse("192.168.1.16");
                 var endPoint = new IPEndPoint(ipAddress, port);
+                var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
 
                 try
@@ -115,31 +113,13 @@ namespace ClientApp.ViewModels
                                 socket.Send(bytes);
                             }
                         });
-
-                        var receiver = Task.Run(() =>
-                        {
-                            var length = 0;
-                            var bytes = new byte[1024];
-                            do
-                            {
-                                length = socket.Receive(bytes);
-                                if (length > 0)
-                                {
-                                    var msg = Encoding.UTF8.GetString(bytes, 0, length);
-                                    Console.WriteLine(msg);
-                                }
-                            }
-                            while (true);
-                        });
-
-                        Task.WaitAll(receiver, sender);
+                        Task.WaitAll( sender);
                     }
                 }
                 catch (Exception)
                 {
                     Console.WriteLine("Can not connect to the server");
                 }
-
 
             });
 
