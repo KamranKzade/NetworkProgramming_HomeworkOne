@@ -10,6 +10,7 @@ using ServerApp.Views.UserControls;
 using System.Windows.Media.Imaging;
 using System.Collections.ObjectModel;
 using System.Windows.Controls.Primitives;
+using System.Windows.Controls;
 
 
 namespace ServerApp.ViewModels
@@ -38,10 +39,11 @@ namespace ServerApp.ViewModels
 
             var port = 27001;
             var ipAddress = IPAddress.Parse("192.168.1.16");
+            var endPoint = new IPEndPoint(ipAddress, port);
+
 
             using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
             {
-                var endPoint = new IPEndPoint(ipAddress, port);
                 socket.Bind(endPoint);
                 socket.Listen(5);
 
@@ -64,7 +66,12 @@ namespace ServerApp.ViewModels
                             var ClientGalaryImage = JsonConvert.DeserializeObject<MyImage>(msj);
 
 
-                            GalaryImages.Add(ClientGalaryImage);
+                            // GalaryImages.Add(ClientGalaryImage);
+
+                            App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                            {
+                                GalaryImages.Add(ClientGalaryImage);
+                            });
 
                             foreach (var image in GalaryImages)
                             {
@@ -78,7 +85,12 @@ namespace ServerApp.ViewModels
                                 var uc = new Picture_UserControl();
                                 uc.DataContext = vm;
 
-                                uniform.Children.Add(uc);
+                                // uniform.Children.Add(uc);
+
+                                App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                                {
+                                    uniform.Children.Add(uc);
+                                });
                             }
 
                             if (ClientGalaryImage.Name == "Exit")
