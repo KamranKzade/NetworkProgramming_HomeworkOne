@@ -106,14 +106,12 @@ namespace ClientApp.ViewModels
                         MessageBox.Show("Connected to the Server");
                         var sender = Task.Run(() =>
                         {
-                            while (true)
-                            {
-                                string s = JsonConvert.SerializeObject(Image);
-                                var bytes = Encoding.UTF8.GetBytes(s);
-                                socket.Send(bytes);
-                            }
+
+                            string s = JsonConvert.SerializeObject(Image);
+                            var bytes = Encoding.UTF8.GetBytes(s);
+                            socket.Send(bytes);
                         });
-                        Task.WaitAll( sender);
+                        Task.WaitAll(sender);
                     }
                 }
                 catch (Exception)

@@ -71,12 +71,11 @@ namespace ServerApp.ViewModels
                                 var ClientGalaryImage = JsonConvert.DeserializeObject<MyImage>(msj);
 
 
-                                // GalaryImages.Add(ClientGalaryImage);
-
                                 App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
                                 {
                                     GalaryImages.Add(ClientGalaryImage);
                                 });
+
 
                                 foreach (var image in GalaryImages)
                                 {
@@ -87,13 +86,10 @@ namespace ServerApp.ViewModels
                                     vm.CurrentImageSource = picture;
                                     vm.Photo = image;
 
-                                    var uc = new Picture_UserControl();
-                                    uc.DataContext = vm;
-
-                                    // uniform.Children.Add(uc);
-
                                     App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
                                     {
+                                        var uc = new Picture_UserControl();
+                                        uc.DataContext = vm;
                                         uniform.Children.Add(uc);
                                     });
 
@@ -109,12 +105,10 @@ namespace ServerApp.ViewModels
 
                         });
                         task.Start();
-
-
                     }
                 }
             });
-
+            thread.Start();
         }
     }
 }
