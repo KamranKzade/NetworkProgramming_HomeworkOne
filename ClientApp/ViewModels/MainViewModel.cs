@@ -79,7 +79,7 @@ namespace ClientApp.ViewModels
             });
 
 
-            var port = 27001;
+            var port = 45678;
             var ipAddress = IPAddress.Parse("192.168.1.16");
 
             var endPoint = new IPEndPoint(ipAddress, port);
