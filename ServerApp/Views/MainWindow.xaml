@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ServerApp"
+        xmlns:userControl="clr-namespace:ServerApp.Views.UserControls"
+        xmlns:local="clr-namespace:ServerApp" xmlns:intr="http://schemas.microsoft.com/expression/2010/interactivity"
         mc:Ignorable="d"
         Title="ServerApp"
         Height="600"
@@ -11,7 +12,14 @@
         Width="800"
         ResizeMode="NoResize" 
         Icon="/Images/server.png"
+        
         >
+    <intr:Interaction.Triggers>
+        <intr:EventTrigger EventName="Loaded">
+            <intr:InvokeCommandAction Command="{Binding WindowLoaded}"/>
+        </intr:EventTrigger>
+    </intr:Interaction.Triggers>
+    
     <Window.Background>
         <LinearGradientBrush>
             <GradientStop Color="Yellow" Offset="0"/>
@@ -43,8 +51,17 @@
                          Columns="3"
                          Background="{StaticResource wrapPanelColor}">
 
-
             </UniformGrid>
+
+            <!--<ListBox ItemsSource="{Binding GalaryImages, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     >
+                <ItemsControl>
+                    <DataTemplate>
+                        <TextBox Text="{Binding Name}"></TextBox>
+                    </DataTemplate>
+                </ItemsControl>
+            </ListBox>-->
+
         </ScrollViewer>
 
     </Grid>

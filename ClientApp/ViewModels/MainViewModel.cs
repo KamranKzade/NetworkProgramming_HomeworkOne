@@ -52,6 +52,9 @@ namespace ClientApp.ViewModels
 
 
 
+        public Socket MySocket { get; set; }
+
+
         public MainViewModel()
         {
             Image = new MyImage();
@@ -63,7 +66,8 @@ namespace ClientApp.ViewModels
                 OpenFileDialog Op = new OpenFileDialog();
 
                 Op.Title = "Select a picture";
-                Op.Filter = "JPEG Files (*.jpeg)|*.jpeg|PNG Files (*.png)|*.png|JPG Files (*.jpg)|*.jpg|GIF Files (*.gif)|*.gif";
+                Op.Filter = "PNG Files (*.png)|*.png|JPEG Files (*.jpeg)|*.jpeg|JPG Files (*.jpg)|*.jpg|GIF Files (*.gif)|*.gif";
+
 
                 if (Op.ShowDialog() == true)
                 {
@@ -77,6 +81,11 @@ namespace ClientApp.ViewModels
 
             var port = 27001;
             var ipAddress = IPAddress.Parse("192.168.1.16");
+
+            var endPoint = new IPEndPoint(ipAddress, port);
+            MySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            MySocket.Connect(endPoint);
+
 
 
             AddImageButtonWithCommand = new RelayCommand((o) =>
@@ -93,25 +102,22 @@ namespace ClientApp.ViewModels
                     MessageBox.Show(ex.Message, "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
 
-                var endPoint = new IPEndPoint(ipAddress, port);
-                var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
 
                 try
                 {
-                    socket.Connect(endPoint);
 
-                    if (socket.Connected)
+                    if (MySocket.Connected)
                     {
                         MessageBox.Show("Connected to the Server");
                         var sender = Task.Run(() =>
                         {
-
                             string s = JsonConvert.SerializeObject(Image);
                             var bytes = Encoding.UTF8.GetBytes(s);
-                            socket.Send(bytes);
+                            MySocket.Send(bytes);
                         });
+
                         Task.WaitAll(sender);
+
                     }
                 }
                 catch (Exception)

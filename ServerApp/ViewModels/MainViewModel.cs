@@ -6,11 +6,16 @@ using Newtonsoft.Json;
 using ServerApp.Models;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using ServerApp.Views.UserControls;
 using System.Windows.Media.Imaging;
 using System.Collections.ObjectModel;
 using System.Windows.Controls.Primitives;
 using System.Threading;
+using ServerApp.Views.UserControls;
+using ServerApp.Commands;
+using System.Windows.Controls;
+using ServerApp.Repositories;
+
+
 
 namespace ServerApp.ViewModels
 {
@@ -26,38 +31,48 @@ namespace ServerApp.ViewModels
                 OnPropertyChanged();
             }
         }
+
+
         public BitmapImage CurrentPicture { get; set; }
+        public RelayCommand WindowLoaded { get; set; }
 
+        public UniformGrid myGrid { get; set; }
 
+        public Socket MySocket { get; set; }
 
 
         public MainViewModel(UniformGrid uniform)
         {
             GalaryImages = new ObservableCollection<MyImage>();
 
+            myGrid = uniform;
+
+            GalaryImages.CollectionChanged += GalaryImages_CollectionChanged;
 
             var port = 27001;
             var ipAddress = IPAddress.Parse("192.168.1.16");
             var endPoint = new IPEndPoint(ipAddress, port);
+            MySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
 
-            Thread thread = new Thread(() =>
+            WindowLoaded = new RelayCommand((o) =>
             {
-                using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+                Thread thread = new Thread(() =>
                 {
-                    socket.Bind(endPoint);
-                    socket.Listen(5);
+                    GalaryImages.Clear();
+
+                    MySocket.Bind(endPoint);
+                    MySocket.Listen(5);
 
                     while (true)
                     {
-                        var client = socket.Accept();
+                        var client = MySocket.Accept();
 
                         var task = new Task(() =>
                         {
-
-                            MessageBox.Show(($"{client.RemoteEndPoint} connected successfully"), "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                            // MessageBox.Show(($"{client.RemoteEndPoint} connected successfully"), "Information", MessageBoxButton.OK, MessageBoxImage.Information);
                             var length = 0;
-                            var bytes = new byte[short.MaxValue];
+                            var bytes = new byte[100000000];
 
                             do
                             {
@@ -71,25 +86,6 @@ namespace ServerApp.ViewModels
                                     GalaryImages.Add(ClientGalaryImage);
                                 });
 
-
-                                //foreach (var image in GalaryImages)
-                                //{
-                                //    BitmapImage picture = new BitmapImage(new Uri(ClientGalaryImage.ImageUrl, UriKind.Relative));
-                                //    CurrentPicture = picture;
-
-                                //    var vm = new UC_ViewModel();
-                                //    vm.CurrentImageSource = picture;
-                                //    vm.Photo = ClientGalaryImage;
-                                    
-                                //    App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
-                                //    {
-                                //        var uc = new Picture_UserControl();
-                                //        uc.DataContext = vm;
-                                //        uniform.Children.Add(uc);
-                                //    });
-
-                                //}
-
                                 if (ClientGalaryImage.Name == "Exit")
                                 {
                                     client.Shutdown(SocketShutdown.Both);
@@ -97,13 +93,42 @@ namespace ServerApp.ViewModels
                                     break;
                                 }
                             } while (true);
-
                         });
                         task.Start();
                     }
-                }
+                });
+
+                thread.Start();
             });
-            thread.Start();
+        }
+
+
+
+
+        private void GalaryImages_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+            {
+                myGrid.Children.Clear();
+            });
+
+
+            foreach (var item in GalaryImages)
+            {
+                BitmapImage picture = new BitmapImage(new Uri(item.ImageUrl, UriKind.Relative));
+                CurrentPicture = picture;
+
+                var vm = new UC_ViewModel();
+                vm.CurrentImageSource = picture;
+                vm.Photo = item;
+
+                App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                {
+                    var uc = new Picture_UserControl();
+                    uc.DataContext = vm;
+                    myGrid.Children.Add(uc);
+                });
+            }
         }
     }
 }
