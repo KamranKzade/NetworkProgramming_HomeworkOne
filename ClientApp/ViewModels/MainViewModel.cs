@@ -105,7 +105,6 @@ namespace ClientApp.ViewModels
 
                 try
                 {
-
                     if (MySocket.Connected)
                     {
                         MessageBox.Show("Connected to the Server");

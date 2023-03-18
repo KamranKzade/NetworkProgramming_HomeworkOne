@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Net;
 using System.Text;
-using System.Windows;
 using Newtonsoft.Json;
 using ServerApp.Models;
+using System.Threading;
 using System.Net.Sockets;
+using ServerApp.Commands;
 using System.Threading.Tasks;
+using ServerApp.Views.UserControls;
 using System.Windows.Media.Imaging;
 using System.Collections.ObjectModel;
 using System.Windows.Controls.Primitives;
-using System.Threading;
-using ServerApp.Views.UserControls;
-using ServerApp.Commands;
-using System.Windows.Controls;
-using ServerApp.Repositories;
 
 
 
@@ -53,6 +50,8 @@ namespace ServerApp.ViewModels
             var ipAddress = IPAddress.Parse("192.168.1.16");
             var endPoint = new IPEndPoint(ipAddress, port);
             MySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            MySocket.Bind(endPoint);
+            MySocket.Listen(5);
 
 
             WindowLoaded = new RelayCommand((o) =>
@@ -60,9 +59,6 @@ namespace ServerApp.ViewModels
                 Thread thread = new Thread(() =>
                 {
                     GalaryImages.Clear();
-
-                    MySocket.Bind(endPoint);
-                    MySocket.Listen(5);
 
                     while (true)
                     {
