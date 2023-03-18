@@ -30,25 +30,26 @@ namespace ServerApp.ViewModels
         }
 
 
-        public BitmapImage CurrentPicture { get; set; }
-        public RelayCommand WindowLoaded { get; set; }
-
-        public UniformGrid myGrid { get; set; }
-
         public Socket MySocket { get; set; }
+        public UniformGrid MyUniformGrid { get; set; }
+        public RelayCommand WindowLoaded { get; set; }
+        public BitmapImage CurrentPicture { get; set; }
+
 
 
         public MainViewModel(UniformGrid uniform)
         {
+            MyUniformGrid = uniform;
             GalaryImages = new ObservableCollection<MyImage>();
 
-            myGrid = uniform;
 
             GalaryImages.CollectionChanged += GalaryImages_CollectionChanged;
 
             var port = 45678;
             var ipAddress = IPAddress.Parse("192.168.1.16");
+
             var endPoint = new IPEndPoint(ipAddress, port);
+            
             MySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             MySocket.Bind(endPoint);
             MySocket.Listen(5);
@@ -93,7 +94,6 @@ namespace ServerApp.ViewModels
                         task.Start();
                     }
                 });
-
                 thread.Start();
             });
         }
@@ -103,9 +103,9 @@ namespace ServerApp.ViewModels
 
         private void GalaryImages_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+            App.Current.Dispatcher.Invoke((Action)delegate
             {
-                myGrid.Children.Clear();
+                MyUniformGrid.Children.Clear();
             });
 
 
@@ -118,11 +118,11 @@ namespace ServerApp.ViewModels
                 vm.CurrentImageSource = picture;
                 vm.Photo = item;
 
-                App.Current.Dispatcher.Invoke((Action)delegate // <--- HERE
+                App.Current.Dispatcher.Invoke((Action)delegate
                 {
                     var uc = new Picture_UserControl();
                     uc.DataContext = vm;
-                    myGrid.Children.Add(uc);
+                    MyUniformGrid.Children.Add(uc);
                 });
             }
         }

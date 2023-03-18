@@ -84,8 +84,8 @@ namespace ClientApp.ViewModels
 
             var endPoint = new IPEndPoint(ipAddress, port);
             MySocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            MySocket.Connect(endPoint);
 
+            MySocket.Connect(endPoint);
 
 
             AddImageButtonWithCommand = new RelayCommand((o) =>
